@@ -58,6 +58,7 @@ class DefaultPytorchInferenceHandler(default_inference_handler.DefaultInferenceH
                 raise FileNotFoundError("Failed to load model with default model_fn: missing file {}."
                                         .format(DEFAULT_MODEL_FILENAME))
             # Client-framework is CPU only. But model will run in Elastic Inference server with CUDA.
+            print("-------------------------------")
             try:
                 return torch.jit.load(model_path, map_location=torch.device('cpu'))
             except RuntimeError as e:
