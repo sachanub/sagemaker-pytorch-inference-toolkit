@@ -90,8 +90,8 @@ phases:
 
     finally:
       # shut down remote GPU instance
-      # - cleanup-gpu-instances
-      # - cleanup-key-pairs
+      - cleanup-gpu-instances
+      - cleanup-key-pairs
 
       # remove ECR image
       # - aws ecr batch-delete-image --repository-name $ECR_REPO --region $AWS_DEFAULT_REGION --image-ids imageTag=$GENERIC_TAG
