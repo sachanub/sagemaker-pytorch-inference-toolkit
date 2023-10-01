@@ -76,7 +76,6 @@ def test_serve_cpu_model_on_gpu(test_loader, image_uri, sagemaker_local_session,
 def test_serving_calls_model_fn_once(image_uri, sagemaker_local_session, instance_type):
     with _predictor(call_model_fn_once_tar, call_model_fn_once_script, image_uri, sagemaker_local_session,
                     instance_type, model_server_workers=2) as predictor:
-        predictor.accept = None
         predictor.deserializer = deserializers.BytesDeserializer()
 
         # call enough times to ensure multiple requests to a worker
@@ -106,9 +105,7 @@ def _predictor(model_tar, script, image, sagemaker_local_session, instance_type,
 
 
 def _assert_prediction_npy_json(predictor, test_loader, content_type, accept):
-    predictor.content_type = content_type
     predictor.serializer = CONTENT_TYPE_TO_SERIALIZER_MAP[content_type]
-    predictor.accept = accept
     predictor.deserializer = ACCEPT_TYPE_TO_DESERIALIZER_MAP[accept]
 
     data = _get_mnist_batch(test_loader).numpy()
@@ -118,7 +115,6 @@ def _assert_prediction_npy_json(predictor, test_loader, content_type, accept):
 
 
 def _assert_prediction_csv(predictor, test_loader, accept):
-    predictor.accept = accept
     predictor.deserializer = ACCEPT_TYPE_TO_DESERIALIZER_MAP[accept]
 
     data = _get_mnist_batch(test_loader).view(test_loader.batch_size, -1)
