@@ -9,6 +9,7 @@ env:
     EIA_ACCELERATOR_TYPE: 'ml.eia2.medium'
     ECR_REPO: 'sagemaker-test'
     GITHUB_REPO: 'sagemaker-pytorch-serving-container'
+    GITHUB_USER: 'sachanub'
     DLC_ACCOUNT: '763104351884'
     SETUP_FILE: 'setup_cmds.sh'
     SETUP_CMDS: '#!/bin/bash\npython3.8 -m pip install --upgrade pip\npython3.8 -m pip install -U -e .\npython3.8 -m pip install -U -e .[test]'
@@ -69,7 +70,7 @@ phases:
       # - test_cmd="remote-test --github-repo $GITHUB_REPO --test-cmd \"$generic_cmd\" --setup-file $SETUP_FILE --pr-number \"$PR_NUM\""
       # - execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg" "buildspec-toolkit.yml" "artifacts/*"
       - dlc_cmd="IGNORE_COVERAGE=- tox -e py38 -- test/integration/local -vv -rA -s --region $AWS_DEFAULT_REGION --docker-base-name $ECR_REPO --aws-id $ACCOUNT --framework-version $FRAMEWORK_VERSION --processor gpu --tag $DLC_GPU_TAG"
-      - test_cmd="remote-test --github-repo $GITHUB_REPO --test-cmd \"$dlc_cmd\" --setup-file $SETUP_FILE --pr-number \"$PR_NUM\" --python-version \"3.8\""
+      - test_cmd="remote-test --github-user $GITHUB_USER --github-repo $GITHUB_REPO --test-cmd \"$dlc_cmd\" --setup-file $SETUP_FILE --pr-number \"$PR_NUM\" --python-version \"3.8\""
       - execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg" "buildspec-toolkit.yml" "artifacts/*"
 
       # run CPU sagemaker integration tests
