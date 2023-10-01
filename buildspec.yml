@@ -8,7 +8,7 @@ env:
     GPU_INSTANCE_TYPE: 'ml.g4dn.xlarge'
     EIA_ACCELERATOR_TYPE: 'ml.eia2.medium'
     ECR_REPO: 'sagemaker-test'
-    GITHUB_REPO: 'sagemaker-pytorch-serving-container'
+    GITHUB_REPO: 'sagemaker-pytorch-inference-toolkit'
     GITHUB_USER: 'sachanub'
     DLC_ACCOUNT: '763104351884'
     SETUP_FILE: 'setup_cmds.sh'
