@@ -31,7 +31,7 @@ def test_mnist_cpu_inductor(sagemaker_session, image_uri, instance_type):
 @pytest.mark.gpu_test
 @pytest.mark.parametrize("instance_type", SM_SINGLE_GPU_INSTANCE_TYPES)
 def test_mnist_gpu(sagemaker_session, image_uri, instance_type):
-    _test_mnist_distributed(sagemaker_session, image_uri, instance_type, model_gpu_tar, mnist_gpu_script)
+    _test_mnist_distributed(sagemaker_session, image_uri, instance_type, model_inductor_tar, mnist_inductor_script)
 
 
 def _test_mnist_distributed(sagemaker_session, image_uri, instance_type, model_tar, mnist_script,
