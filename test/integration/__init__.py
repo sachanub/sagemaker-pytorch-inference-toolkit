@@ -24,6 +24,7 @@ training_dir = os.path.join(data_dir, 'training')
 cpu_sub_dir = 'model_cpu'
 gpu_sub_dir = 'model_gpu'
 eia_sub_dir = 'model_eia'
+inductor_sub_dir = 'model_inductor'
 code_sub_dir = 'code'
 default_sub_dir = 'default_model'
 default_sub_eia_dir = 'default_model_eia'
@@ -55,6 +56,12 @@ mnist_eia_script = os.path.join(model_eia_dir, 'mnist.py')
 model_eia_tar = file_utils.make_tarfile(mnist_eia_script,
                                         os.path.join(model_eia_dir, "torch_model.pth"),
                                         model_eia_dir)
+
+model_inductor_dir = os.path.join(mnist_path, inductor_sub_dir)
+mnist_inductor_script = os.path.join(model_inductor_dir, 'mnist.py')
+model_inductor_tar = file_utils.make_tarfile(mnist_inductor_script,
+                                        os.path.join(model_inductor_dir, "torch_model.pth"),
+                                        model_inductor_dir)
 
 call_model_fn_once_script = os.path.join(model_cpu_dir, code_sub_dir, 'call_model_fn_once.py')
 call_model_fn_once_tar = file_utils.make_tarfile(call_model_fn_once_script,

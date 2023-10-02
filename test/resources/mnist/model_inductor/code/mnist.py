@@ -42,7 +42,7 @@ class Net(nn.Module):
     def forward(self, x):
         x = F.relu(F.max_pool2d(self.conv1(x), 2))
         x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
-        x = x.view(-1, 320)
+        x = x.reshape(-1, 320)
         x = F.relu(self.fc1(x))
         x = F.dropout(x, training=self.training)
         x = self.fc2(x)
@@ -52,8 +52,10 @@ class Net(nn.Module):
 def model_fn(model_dir):
     logger.info('model_fn')
     model = torch.nn.DataParallel(Net())
-    with open(os.path.join(model_dir, 'torch_model.pth'), 'rb') as f:
+    with open(os.path.join(model_dir, 'model.pth'), 'rb') as f:
         model.load_state_dict(torch.load(f))
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     model = model.to(device)
+    model = torch.compile(model)
+    logger.info("Model compiled with inductor backend")
     return model
