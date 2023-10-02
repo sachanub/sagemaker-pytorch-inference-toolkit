@@ -20,17 +20,18 @@ from sagemaker.pytorch import PyTorchModel
 from integration import model_inductor_tar, mnist_inductor_script
 from integration.sagemaker.timeout import timeout_and_delete_endpoint
 
+SM_CPU_INSTANCE_TYPES = ["ml.c5.9xlarge"]
 SM_SINGLE_GPU_INSTANCE_TYPES = ["ml.p3.2xlarge", "ml.g4dn.4xlarge", "ml.g5.4xlarge"]
 
 @pytest.mark.cpu_test
+@pytest.mark.parametrize("instance_type", SM_CPU_INSTANCE_TYPES)
 def test_mnist_cpu_inductor(sagemaker_session, image_uri, instance_type):
-    instance_type = instance_type or 'ml.c5.9xlarge'
     _test_mnist_distributed(sagemaker_session, image_uri, instance_type, model_inductor_tar, mnist_inductor_script)
 
 
 @pytest.mark.gpu_test
 @pytest.mark.parametrize("instance_type", SM_SINGLE_GPU_INSTANCE_TYPES)
-def test_mnist_gpu(sagemaker_session, image_uri, instance_type):
+def test_mnist_gpu_inductor(sagemaker_session, image_uri, instance_type):
     _test_mnist_distributed(sagemaker_session, image_uri, instance_type, model_inductor_tar, mnist_inductor_script)
 
 
