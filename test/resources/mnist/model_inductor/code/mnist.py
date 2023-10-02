@@ -52,7 +52,7 @@ class Net(nn.Module):
 def model_fn(model_dir):
     logger.info('model_fn')
     model = torch.nn.DataParallel(Net())
-    with open(os.path.join(model_dir, 'model.pth'), 'rb') as f:
+    with open(os.path.join(model_dir, 'torch_model.pth'), 'rb') as f:
         model.load_state_dict(torch.load(f))
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     model = model.to(device)
