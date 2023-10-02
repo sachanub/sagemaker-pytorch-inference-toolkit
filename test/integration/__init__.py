@@ -58,7 +58,7 @@ model_eia_tar = file_utils.make_tarfile(mnist_eia_script,
                                         model_eia_dir)
 
 model_inductor_dir = os.path.join(mnist_path, inductor_sub_dir)
-mnist_inductor_script = os.path.join(model_inductor_dir, 'mnist.py')
+mnist_inductor_script = os.path.join(model_inductor_dir, code_sub_dir, 'mnist.py')
 model_inductor_tar = file_utils.make_tarfile(mnist_inductor_script,
                                         os.path.join(model_inductor_dir, "torch_model.pth"),
                                         model_inductor_dir)
