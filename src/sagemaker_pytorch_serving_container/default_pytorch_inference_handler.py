@@ -111,19 +111,11 @@ class DefaultPytorchInferenceHandler(default_inference_handler.DefaultInferenceH
         Returns: a prediction
         """
         with torch.no_grad():
-            if os.getenv(INFERENCE_ACCELERATOR_PRESENT_ENV) == "true":
-                device = torch.device("cpu")
-                model = model.to(device)
-                input_data = data.to(device)
-                model.eval()
-                with torch.jit.optimized_execution(True, {"target_device": "eia:0"}):
-                    output = model(input_data)
-            else:
-                device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-                model = model.to(device)
-                input_data = data.to(device)
-                model.eval()
-                output = model(input_data)
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            model = model.to(device)
+            input_data = data.to(device)
+            model.eval()
+            output = model(input_data)
 
         return output
 

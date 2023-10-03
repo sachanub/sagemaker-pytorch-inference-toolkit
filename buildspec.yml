@@ -40,7 +40,7 @@ phases:
       
       # run local CPU integration tests (build and push the image to ECR repo)
       - test_cmd="IGNORE_COVERAGE=- tox -e py38 -- test/integration/local -vv -rA -s --build-image --push-image --dockerfile-type dlc.cpu --region $AWS_DEFAULT_REGION --docker-base-name $ECR_REPO --aws-id $ACCOUNT --framework-version $FRAMEWORK_VERSION --processor cpu --tag $DLC_CPU_TAG"
-      - execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg" "buildspec-toolkit.yml" "artifacts/*"
+      - execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg"
 
       # launch remote GPU instance
       - prefix='ml.'
@@ -62,15 +62,15 @@ phases:
       # no reason to rebuild the image again since it was already built and pushed to ECR during CPU tests
       - dlc_cmd="IGNORE_COVERAGE=- tox -e py38 -- test/integration/local -vv -rA -s --region $AWS_DEFAULT_REGION --docker-base-name $ECR_REPO --aws-id $ACCOUNT --framework-version $FRAMEWORK_VERSION --processor gpu --tag $DLC_GPU_TAG"
       - test_cmd="remote-test --github-user $GITHUB_USER --github-repo $GITHUB_REPO --test-cmd \"$dlc_cmd\" --setup-file $SETUP_FILE --pr-number \"$PR_NUM\" --python-version \"3.8\""
-      - execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg" "buildspec-toolkit.yml" "artifacts/*"
+      - execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg"
 
       # run CPU sagemaker integration tests
       - test_cmd="IGNORE_COVERAGE=- tox -e py38 -- test/integration/sagemaker --region $AWS_DEFAULT_REGION --docker-base-name $ECR_REPO --aws-id $ACCOUNT --framework-version $FRAMEWORK_VERSION --processor cpu --instance-type $CPU_INSTANCE_TYPE --tag $DLC_CPU_TAG"
-      - execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg" "buildspec-toolkit.yml" "artifacts/*"
+      - execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg"
 
       # run GPU sagemaker integration tests
       - test_cmd="IGNORE_COVERAGE=- tox -e py38 -- test/integration/sagemaker --region $AWS_DEFAULT_REGION --docker-base-name $ECR_REPO --aws-id $ACCOUNT --framework-version $FRAMEWORK_VERSION --processor gpu --instance-type $GPU_INSTANCE_TYPE --tag $DLC_GPU_TAG"
-      - execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg" "buildspec-toolkit.yml" "artifacts/*"
+      - execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg"
 
     finally:
       # shut down remote GPU instance
