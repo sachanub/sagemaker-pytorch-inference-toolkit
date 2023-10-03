@@ -66,8 +66,9 @@ def test_serve_csv(test_loader, use_gpu, image_uri, sagemaker_local_session, ins
             _assert_prediction_csv(predictor, test_loader, accept)
 
 
-@pytest.mark.gpu_test
 def test_serve_cpu_model_on_gpu(test_loader, image_uri, sagemaker_local_session, instance_type):
+    if 'cpu' in image_uri:
+        pytest.skip("Skipping because running on CPU instance")
     with _predictor(model_cpu_1d_tar, mnist_1d_script, image_uri, sagemaker_local_session,
                     instance_type) as predictor:
         _assert_prediction_npy_json(predictor, test_loader, content_types.NPY, content_types.JSON)
