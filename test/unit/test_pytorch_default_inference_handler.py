@@ -53,11 +53,6 @@ def inference_handler():
     return default_pytorch_inference_handler.DefaultPytorchInferenceHandler()
 
 
-@pytest.fixture()
-def eia_inference_handler():
-    return default_pytorch_inference_handler.DefaultPytorchInferenceHandler()
-
-
 def test_default_model_fn(inference_handler):
     with mock.patch("sagemaker_pytorch_serving_container.default_pytorch_inference_handler.os") as mock_os:
         mock_os.getenv.return_value = "true"
@@ -102,18 +97,6 @@ def test_default_model_fn_no_model_file(inference_handler, listdir_return_value)
 
 def _produce_runtime_error(x, **kwargs):
     raise RuntimeError("dummy runtime error")
-
-
-@pytest.mark.parametrize("test_case", ["eia", "non_eia"])
-def test_default_model_fn_non_torchscript_model(inference_handler, test_case):
-    with mock.patch("sagemaker_pytorch_serving_container.default_pytorch_inference_handler.os") as mock_os:
-        mock_os.getenv.return_value = "true" if test_case == "eia" else "false"
-        mock_os.path.join = os.path.join
-        mock_os.path.exists.return_value = True
-        with mock.patch("torch.jit") as mock_torch_jit:
-            mock_torch_jit.load = _produce_runtime_error
-            with pytest.raises(Exception, match=r"Failed to load .*. Please ensure model is saved using torchscript."):
-                inference_handler.default_model_fn("model_dir")
 
 
 def test_default_input_fn_json(inference_handler, tensor):
@@ -239,33 +222,3 @@ def test_default_output_fn_gpu(inference_handler):
     output = inference_handler.default_output_fn(tensor_gpu, content_types.CSV)
 
     assert "1,2,3\n4,5,6\n".encode("utf-8") == output
-
-
-def test_eia_default_model_fn(eia_inference_handler):
-    with mock.patch("sagemaker_pytorch_serving_container.default_pytorch_inference_handler.os") as mock_os:
-        mock_os.getenv.return_value = "true"
-        mock_os.path.join.return_value = "model_dir"
-        mock_os.path.exists.return_value = True
-        with mock.patch("torch.jit.load") as mock_torch:
-            mock_torch.return_value = DummyModel()
-            model = eia_inference_handler.default_model_fn("model_dir")
-    assert model is not None
-
-
-def test_eia_default_model_fn_error(eia_inference_handler):
-    with mock.patch("sagemaker_pytorch_serving_container.default_pytorch_inference_handler.os") as mock_os:
-        mock_os.getenv.return_value = "true"
-        mock_os.path.join.return_value = "model_dir"
-        mock_os.path.exists.return_value = False
-        with pytest.raises(FileNotFoundError):
-            eia_inference_handler.default_model_fn("model_dir")
-
-
-def test_eia_default_predict_fn(eia_inference_handler, tensor):
-    model = DummyModel()
-    with mock.patch("sagemaker_pytorch_serving_container.default_pytorch_inference_handler.os") as mock_os:
-        mock_os.getenv.return_value = "true"
-        with mock.patch("torch.jit.optimized_execution") as mock_torch:
-            mock_torch.__enter__.return_value = "dummy"
-            eia_inference_handler.default_predict_fn(tensor, model)
-        mock_torch.assert_called_once()

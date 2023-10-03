@@ -23,11 +23,9 @@ data_dir = os.path.join(mnist_path, 'data')
 training_dir = os.path.join(data_dir, 'training')
 cpu_sub_dir = 'model_cpu'
 gpu_sub_dir = 'model_gpu'
-eia_sub_dir = 'model_eia'
 inductor_sub_dir = 'model_inductor'
 code_sub_dir = 'code'
 default_sub_dir = 'default_model'
-default_sub_eia_dir = 'default_model_eia'
 default_sub_traced_resnet_dir = 'default_traced_resnet'
 
 model_cpu_dir = os.path.join(mnist_path, cpu_sub_dir)
@@ -50,12 +48,6 @@ model_gpu_tar = file_utils.make_tarfile(mnist_gpu_script,
                                         os.path.join(model_gpu_dir, "torch_model.pth"),
                                         model_gpu_dir,
                                         script_path="code")
-
-model_eia_dir = os.path.join(mnist_path, eia_sub_dir)
-mnist_eia_script = os.path.join(model_eia_dir, 'mnist.py')
-model_eia_tar = file_utils.make_tarfile(mnist_eia_script,
-                                        os.path.join(model_eia_dir, "torch_model.pth"),
-                                        model_eia_dir)
 
 model_inductor_dir = os.path.join(mnist_path, inductor_sub_dir)
 mnist_inductor_script = os.path.join(model_inductor_dir, code_sub_dir, 'mnist.py')
@@ -84,12 +76,6 @@ default_model_traced_resnet18_tar = file_utils.make_tarfile(
     default_traced_resnet_dir,
     filename="traced_resnet18.tar.gz",
     script_path="code",
-)
-
-default_model_eia_dir = os.path.join(mnist_path, default_sub_eia_dir)
-default_model_eia_script = os.path.join(default_model_eia_dir, code_sub_dir, "mnist.py")
-default_model_eia_tar = file_utils.make_tarfile(
-    default_model_eia_script, os.path.join(default_model_eia_dir, "model.pt"), default_model_eia_dir
 )
 
 ROLE = 'dummy/unused-role'

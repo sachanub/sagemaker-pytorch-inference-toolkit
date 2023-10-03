@@ -35,8 +35,7 @@ def test_mnist_gpu_inductor(sagemaker_session, image_uri, instance_type):
     _test_mnist_distributed(sagemaker_session, image_uri, instance_type, model_inductor_tar, mnist_inductor_script)
 
 
-def _test_mnist_distributed(sagemaker_session, image_uri, instance_type, model_tar, mnist_script,
-                            accelerator_type=None):
+def _test_mnist_distributed(sagemaker_session, image_uri, instance_type, model_tar, mnist_script):
     endpoint_name = sagemaker.utils.unique_name_from_base("sagemaker-pytorch-serving")
 
     model_data = sagemaker_session.upload_data(
