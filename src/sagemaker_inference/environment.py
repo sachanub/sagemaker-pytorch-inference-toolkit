@@ -18,16 +18,11 @@ from __future__ import absolute_import
 import os
 from typing import Optional
 
-from sagemaker_inference import content_types, logging, parameters
-
-logger = logging.get_logger()
+from sagemaker_inference import content_types, parameters
 
 DEFAULT_MODULE_NAME = "inference.py"
 DEFAULT_MODEL_SERVER_TIMEOUT = "60"
-DEFAULT_STARTUP_TIMEOUT = "600"  # 10 minutes
 DEFAULT_HTTP_PORT = "8080"
-DEFAULT_VMARGS = "-XX:-UseContainerSupport"
-DEFAULT_MAX_REQUEST_SIZE = None
 
 SAGEMAKER_BASE_PATH = os.path.join("/opt", "ml")  # type: str
 
@@ -53,8 +48,6 @@ class Environment(object):
     Attributes:
         module_name (str): The name of the user-provided module. Default is inference.py.
         model_server_timeout (int): Timeout for the model server. Default is 60.
-        model_server_timeout_seconds (Optional[int]): Timeout in seconds for the model server.
-            Default is None.
         model_server_workers (str): Number of worker processes the model server will use.
 
         default_accept (str): The desired default MIME type of the inference in the response
@@ -74,27 +67,16 @@ class Environment(object):
         self._model_server_timeout = int(
             os.environ.get(parameters.MODEL_SERVER_TIMEOUT_ENV, DEFAULT_MODEL_SERVER_TIMEOUT)
         )
-        timeout_seconds_var = os.environ.get(parameters.MODEL_SERVER_TIMEOUT_SECONDS_ENV)
-        self._model_server_timeout_seconds = (
-            int(timeout_seconds_var) if timeout_seconds_var is not None else None
-        )
-
+        
         self._model_server_workers = os.environ.get(parameters.MODEL_SERVER_WORKERS_ENV)
 
-        self._startup_timeout = int(
-            os.environ.get(parameters.STARTUP_TIMEOUT_ENV, DEFAULT_STARTUP_TIMEOUT)
-        )
         self._default_accept = os.environ.get(
             parameters.DEFAULT_INVOCATIONS_ACCEPT_ENV, content_types.JSON
         )
         self._inference_http_port = os.environ.get(parameters.BIND_TO_PORT_ENV, DEFAULT_HTTP_PORT)
         self._management_http_port = os.environ.get(parameters.BIND_TO_PORT_ENV, DEFAULT_HTTP_PORT)
         self._safe_port_range = os.environ.get(parameters.SAFE_PORT_RANGE_ENV)
-        self._vmargs = os.environ.get(parameters.MODEL_SERVER_VMARGS, DEFAULT_VMARGS)
-        self._max_request_size_in_mb = os.environ.get(
-            parameters.MAX_REQUEST_SIZE, DEFAULT_MAX_REQUEST_SIZE
-        )
-
+        
     @staticmethod
     def _parse_module_name(program_param):
         """Given a module name or a script name, return the module name.

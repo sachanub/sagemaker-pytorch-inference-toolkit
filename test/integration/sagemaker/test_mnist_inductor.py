@@ -26,14 +26,14 @@ SM_SINGLE_GPU_INSTANCE_TYPES = ["ml.p3.2xlarge", "ml.g4dn.4xlarge", "ml.g5.4xlar
 
 @pytest.mark.parametrize("instance_type", SM_CPU_INSTANCE_TYPES)
 def test_mnist_cpu_inductor(sagemaker_session, image_uri, instance_type):
-    if 'gpu' in 'image_uri':
+    if 'gpu' in image_uri:
         pytest.skip('Skipping because test will run on \'{}\' instance'.format(instance_type))
     _test_mnist_distributed(sagemaker_session, image_uri, instance_type, model_inductor_tar, mnist_inductor_script)
 
 
 @pytest.mark.parametrize("instance_type", SM_SINGLE_GPU_INSTANCE_TYPES)
 def test_mnist_gpu_inductor(sagemaker_session, image_uri, instance_type):
-    if 'cpu' in 'image_uri':
+    if 'cpu' in image_uri:
         pytest.skip('Skipping because test will run on \'{}\' instance'.format(instance_type))
     _test_mnist_distributed(sagemaker_session, image_uri, instance_type, model_inductor_tar, mnist_inductor_script)
 
