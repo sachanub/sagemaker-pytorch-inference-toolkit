@@ -19,6 +19,7 @@ from utils import file_utils
 resources_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'resources'))
 mnist_path = os.path.join(resources_path, 'mnist')
 resnet18_path = os.path.join(resources_path, 'resnet18')
+mme_path = os.path.join(resources_path, 'mme')
 data_dir = os.path.join(mnist_path, 'data')
 training_dir = os.path.join(data_dir, 'training')
 cpu_sub_dir = 'model_cpu'
@@ -27,6 +28,8 @@ inductor_sub_dir = 'model_inductor'
 code_sub_dir = 'code'
 default_sub_dir = 'default_model'
 default_sub_traced_resnet_dir = 'default_traced_resnet'
+resnet18_sub_dir = 'resnet18'
+traced_resnet18_sub_dir = 'traced_resnet18'
 
 model_cpu_dir = os.path.join(mnist_path, cpu_sub_dir)
 mnist_cpu_script = os.path.join(model_cpu_dir, code_sub_dir, 'mnist.py')
@@ -76,6 +79,26 @@ default_model_traced_resnet18_tar = file_utils.make_tarfile(
     default_traced_resnet_dir,
     filename="traced_resnet18.tar.gz",
     script_path="code",
+)
+
+resnet18_model_dir = os.path.join(mme_path, resnet18_sub_dir)
+resnet18_script = os.path.join(resnet18_model_dir, code_sub_dir, "inference.py")
+resnet18_tar = file_utils.make_tarfile(
+    resnet18_script,
+    os.path.join(resnet18_model_dir, "model.pt"),
+    resnet18_model_dir,
+    filename="resnet18.tar.gz",
+    script_path="code"
+)
+
+traced_resnet18_model_dir = os.path.join(mme_path, traced_resnet18_sub_dir)
+traced_resnet18_script = os.path.join(traced_resnet18_model_dir, code_sub_dir, "inference.py")
+traced_resnet18_tar = file_utils.make_tarfile(
+    traced_resnet18_script,
+    os.path.join(traced_resnet18_model_dir, "traced_resnet18.pt"),
+    traced_resnet18_model_dir,
+    filename="traced_resnet18.tar.gz",
+    script_path="code"
 )
 
 ROLE = 'dummy/unused-role'
