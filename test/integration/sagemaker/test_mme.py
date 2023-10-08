@@ -45,6 +45,9 @@ def fixture_mme_endpoint(
     sagemaker_session, image_uri, region, use_gpu, resnet18_filename, traced_resnet18_filename, s3, bucket
 ):
     try:
+        if 'neuron' in image_uri:
+            pytest.skip("Skipping for Neuron/NeuronX DLC")
+
         instance_type = 'ml.g4dn.xlarge' if use_gpu else 'ml.c5.xlarge'
         endpoint_name = sagemaker.utils.unique_name_from_base("sagemaker-pytorch-serving")
         
@@ -80,7 +83,9 @@ def fixture_mme_endpoint(
         yield mme
 
     finally:
-        
+        if 'neuron' in image_uri:
+            pytest.skip("Skipping for Neuron/NeuronX DLC")
+
         delete_models([resnet18_filename, traced_resnet18_filename], s3, bucket)
         sagemaker_session.delete_endpoint(endpoint_name)
 
@@ -97,14 +102,12 @@ def fixture_predictor(mme, sagemaker_session):
     return Predictor(endpoint_name=mme.endpoint_name, sagemaker_session=sagemaker_session)
 
 # This test checks that only the ResNet-18 model in present in the multi-model endpoint.
-@pytest.mark.mme_test
 def test_check_only_resnet18_in_mme(mme, resnet18_filename):
     model_list = list(mme.list_models())
     assert resnet18_filename in model_list
     assert len(model_list)==1
 
 # This test checks that only the traced ResNet-18 model in present in the multi-model endpoint.
-@pytest.mark.mme_test
 def test_check_only_traced_resnet18_in_mme(resnet18_filename, traced_resnet18_filename, mme, s3, bucket):
     delete_models([resnet18_filename], s3, bucket)
     add_models([traced_resnet18_tar], mme)
@@ -113,7 +116,6 @@ def test_check_only_traced_resnet18_in_mme(resnet18_filename, traced_resnet18_fi
     assert len(model_list)==1
 
 # This test checks that both the ResNet-18 and traced ResNet-18 models are present in the multi-model endpoint.
-@pytest.mark.mme_test
 def test_check_both_models_in_mme(resnet18_filename, traced_resnet18_filename, mme):
     add_models([resnet18_tar], mme)
     model_list = list(mme.list_models())
@@ -122,14 +124,12 @@ def test_check_both_models_in_mme(resnet18_filename, traced_resnet18_filename, m
     assert len(model_list)==2
 
 # This test checks that no models are present in the multi-model endpoint.
-@pytest.mark.mme_test
 def test_no_models_in_mme(resnet18_filename, traced_resnet18_filename, mme, s3, bucket):
     delete_models([resnet18_filename, traced_resnet18_filename], s3, bucket)
     model_list = list(mme.list_models())
     assert len(model_list)==0
 
 # This test checks the invocation outputs from both the ResNet-18 and traced ResNet-18 models 
-@pytest.mark.mme_test
 def test_invocation(resnet18_filename, traced_resnet18_filename, mme, predictor):
     add_models([resnet18_tar, traced_resnet18_tar], mme)
     image_url = (

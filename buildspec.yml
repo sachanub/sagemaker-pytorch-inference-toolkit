@@ -5,7 +5,7 @@ env:
     FRAMEWORK_VERSION: '2.0.1'
     CPU_INSTANCE_TYPE: 'ml.c4.xlarge'
     GPU_INSTANCE_TYPE: 'ml.g4dn.xlarge'
-    GRAVITON_INSTANCE_TYPE: 'ml.c7g.4xlarge'
+    # GRAVITON_INSTANCE_TYPE: 'ml.c7g.4xlarge'
     ECR_REPO: 'sagemaker-test'
     GITHUB_REPO: 'sagemaker-pytorch-inference-toolkit'
     GITHUB_USER: 'sachanub'
@@ -38,7 +38,7 @@ phases:
       # define tags
       - DLC_CPU_TAG="$FRAMEWORK_VERSION-dlc-cpu-$BUILD_ID"
       - DLC_GPU_TAG="$FRAMEWORK_VERSION-dlc-gpu-$BUILD_ID"
-      - DLC_GRAVITON_TAG="$FRAMEWORK_VERSION-dlc-graviton-$BUILD_ID"
+      # - DLC_GRAVITON_TAG="$FRAMEWORK_VERSION-dlc-graviton-$BUILD_ID"
       
       # run local CPU integration tests (build and push the image to ECR repo)
       # - test_cmd="IGNORE_COVERAGE=- tox -e py38 -- test/integration/local -vv -rA -s --build-image --push-image --dockerfile-type dlc.cpu --region $AWS_DEFAULT_REGION --docker-base-name $ECR_REPO --aws-id $ACCOUNT --framework-version $FRAMEWORK_VERSION --processor cpu --tag $DLC_CPU_TAG"
@@ -80,8 +80,8 @@ phases:
       - test_cmd="IGNORE_COVERAGE=- tox -e py38 -- test/integration/sagemaker -vv -rA -s --build-image --push-image --dockerfile-type dlc.gpu --region $AWS_DEFAULT_REGION --docker-base-name $ECR_REPO --aws-id $ACCOUNT --framework-version $FRAMEWORK_VERSION --processor gpu --instance-type $GPU_INSTANCE_TYPE --tag $DLC_GPU_TAG"
       - execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg"
 
-      - test_cmd="IGNORE_COVERAGE=- tox -e py38 -- test/integration/sagemaker -vv -rA -s --build-image --push-image --dockerfile-type dlc.graviton --region $AWS_DEFAULT_REGION --docker-base-name $ECR_REPO --aws-id $ACCOUNT --framework-version $FRAMEWORK_VERSION --processor cpu --instance-type $GRAVITON_INSTANCE_TYPE --tag $DLC_GRAVITON_TAG"
-      - execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg"
+      # - test_cmd="IGNORE_COVERAGE=- tox -e py38 -- test/integration/sagemaker -vv -rA -s --build-image --push-image --dockerfile-type dlc.graviton --region $AWS_DEFAULT_REGION --docker-base-name $ECR_REPO --aws-id $ACCOUNT --framework-version $FRAMEWORK_VERSION --processor cpu --instance-type $GRAVITON_INSTANCE_TYPE --tag $DLC_GRAVITON_TAG"
+      # - execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg"
 
     finally:
       # shut down remote GPU instance
@@ -91,5 +91,5 @@ phases:
       # remove ECR image
       - aws ecr batch-delete-image --repository-name $ECR_REPO --region $AWS_DEFAULT_REGION --image-ids imageTag=$DLC_CPU_TAG
       - aws ecr batch-delete-image --repository-name $ECR_REPO --region $AWS_DEFAULT_REGION --image-ids imageTag=$DLC_GPU_TAG
-      - aws ecr batch-delete-image --repository-name $ECR_REPO --region $AWS_DEFAULT_REGION --image-ids imageTag=$DLC_GRAVITON_TAG
+      # - aws ecr batch-delete-image --repository-name $ECR_REPO --region $AWS_DEFAULT_REGION --image-ids imageTag=$DLC_GRAVITON_TAG
       

@@ -19,6 +19,7 @@ from utils import file_utils
 resources_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'resources'))
 mnist_path = os.path.join(resources_path, 'mnist')
 resnet18_path = os.path.join(resources_path, 'resnet18')
+resnet_path = os.path.join(resources_path, "resnet")
 mme_path = os.path.join(resources_path, 'mme')
 data_dir = os.path.join(mnist_path, 'data')
 training_dir = os.path.join(data_dir, 'training')
@@ -28,6 +29,8 @@ inductor_sub_dir = 'model_inductor'
 code_sub_dir = 'code'
 default_sub_dir = 'default_model'
 default_sub_traced_resnet_dir = 'default_traced_resnet'
+neuron_sub_dir = "model_neuron"
+neuronx_sub_dir = "model_neuronx"
 resnet18_sub_dir = 'resnet18'
 traced_resnet18_sub_dir = 'traced_resnet18'
 
@@ -100,6 +103,16 @@ traced_resnet18_tar = file_utils.make_tarfile(
     filename="traced_resnet18.tar.gz",
     script_path="code"
 )
+
+model_neuron_dir = os.path.join(resnet_path, neuron_sub_dir)
+resnet_neuron_script = os.path.join(model_neuron_dir, code_sub_dir, "resnet18.py")
+resnet_neuron_input = os.path.join(model_neuron_dir, "cat.jpg")
+resnet_neuron_image_list = os.path.join(model_neuron_dir, "imagenet1000_clsidx_to_labels.txt")
+
+model_neuronx_dir = os.path.join(resnet_path, neuronx_sub_dir)
+resnet_neuronx_script = os.path.join(model_neuronx_dir, code_sub_dir, "resnet18.py")
+resnet_neuronx_input = resnet_neuron_input
+resnet_neuronx_image_list = os.path.join(model_neuronx_dir, "imagenet1000_clsidx_to_labels.txt")
 
 ROLE = 'dummy/unused-role'
 DEFAULT_TIMEOUT = 20

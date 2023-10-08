@@ -45,7 +45,7 @@ def pytest_addoption(parser):
     parser.addoption('--build-image', '-B', action='store_true')
     parser.addoption('--push-image', '-P', action='store_true')
     parser.addoption('--dockerfile-type', '-T',
-                     choices=['dlc.cpu', 'dlc.gpu', 'dlc.graviton'],
+                     choices=['dlc.cpu', 'dlc.gpu', 'dlc.graviton', 'dlc.neuron', 'dlc.neuronx'],
                      default='dlc.cpu')
     parser.addoption('--dockerfile', '-D', default=None)
     parser.addoption('--aws-id', default=None)
@@ -189,6 +189,15 @@ def fixture_dist_gpu_backend(request):
 def skip_by_device_type(request, use_gpu, instance_type):
     is_gpu = use_gpu or instance_type[3] in ['g', 'p']
 
+    is_neuron_inst = instance_type.startswith("ml.inf1")
+    is_neuronx_inst = instance_type.startswith("ml.trn1") or instance_type.startswith("ml.inf2")
+
+    is_neuron_test = request.node.get_closest_marker("neuron_test") is not None
+    is_neuronx_test = request.node.get_closest_marker("neuronx_test") is not None
+
+    if is_neuron_test != is_neuron_inst or is_neuronx_test != is_neuronx_inst:
+        pytest.skip("Skipping for Neuron/NeuronX DLC")
+        
     # Separate out cases for clearer logic.
     # When running GPU test, skip CPU test. When running CPU test, skip GPU test.
     if (request.node.get_closest_marker('gpu_test') and not is_gpu) or \
@@ -230,6 +239,8 @@ def skip_py2_containers(request, tag):
 @pytest.fixture(autouse=True)
 def skip_mme(request, image_uri):
     is_graviton = 'graviton' in image_uri
-    if (request.node.get_closest_marker('mme_test') and is_graviton):
-        pytest.skip('Skipping test because MME is not supported with Graviton instances')
+    is_neuron = 'neuron' in image_uri
+    is_neuronx = 'neuronx' in image_uri
+    if (request.node.get_closest_marker("mme_test") and (is_graviton or is_neuron or is_neuronx)):
+        pytest.skip('Skipping MME tests for Graviton/Neuron/NeuronX DLCs')
 
