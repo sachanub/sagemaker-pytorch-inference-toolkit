@@ -12,6 +12,12 @@
 # language governing permissions and limitations under the License.
 from __future__ import absolute_import
 import os
+
+try:
+    import transformers
+except ImportError:
+    raise ImportError("The 'transformers' module was not found.'")
+    
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

@@ -14,6 +14,11 @@ from __future__ import absolute_import
 
 import os
 
+try:
+    import transformers
+except ImportError:
+    raise ImportError("The 'transformers' module was not found.'")
+
 
 def model_fn(model_dir):
     lock_file = os.path.join(model_dir, 'model_fn.lock.{}'.format(os.getpid()))
