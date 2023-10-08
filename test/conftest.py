@@ -45,7 +45,7 @@ def pytest_addoption(parser):
     parser.addoption('--build-image', '-B', action='store_true')
     parser.addoption('--push-image', '-P', action='store_true')
     parser.addoption('--dockerfile-type', '-T',
-                     choices=['dlc.cpu', 'dlc.gpu'],
+                     choices=['dlc.cpu', 'dlc.gpu', 'dlc.graviton'],
                      default='dlc.cpu')
     parser.addoption('--dockerfile', '-D', default=None)
     parser.addoption('--aws-id', default=None)
@@ -226,3 +226,10 @@ def skip_py2_containers(request, tag):
     if request.node.get_closest_marker('skip_py2_containers'):
         if 'py2' in tag:
             pytest.skip('Skipping python2 container with tag {}'.format(tag))
+
+@pytest.fixture(autouse=True)
+def skip_mme(request, image_uri):
+    is_graviton = 'graviton' in image_uri
+    if (request.node.get_closest_marker('mme_test') and is_graviton):
+        pytest.skip('Skipping test because MME is not supported with Graviton instances')
+
