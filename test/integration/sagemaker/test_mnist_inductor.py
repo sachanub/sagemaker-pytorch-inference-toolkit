@@ -33,7 +33,7 @@ def test_mnist_cpu_inductor(sagemaker_session, image_uri, instance_type):
 
 
 @pytest.mark.parametrize("instance_type", SM_GRAVITON_INSTANCE_TYPES)
-def test_mnist_gpu_inductor(sagemaker_session, image_uri, instance_type):
+def test_mnist_graviton_inductor(sagemaker_session, image_uri, instance_type):
     if 'cpu' in image_uri or 'gpu' in image_uri:
         pytest.skip('Skipping because test will run on \'{}\' instance'.format(instance_type))
     _test_mnist_distributed(sagemaker_session, image_uri, instance_type, model_inductor_tar, mnist_inductor_script)
