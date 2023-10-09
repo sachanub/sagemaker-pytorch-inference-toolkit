@@ -38,18 +38,23 @@ def test_mnist_gpu_inductor(sagemaker_session, image_uri, instance_type):
     _test_mnist_distributed(sagemaker_session, image_uri, instance_type, model_inductor_tar, mnist_inductor_script)
 
 
-def _test_mnist_distributed(sagemaker_session, image_uri, instance_type, model_tar, mnist_script):
+def _test_mnist_distributed(sagemaker_session, image_uri, instance_type, model_tar, mnist_script, env_vars=None):
     endpoint_name = sagemaker.utils.unique_name_from_base("sagemaker-pytorch-serving")
 
     model_data = sagemaker_session.upload_data(
         path=model_tar,
         key_prefix="sagemaker-pytorch-serving/models",
     )
+    
+    if 'gpu' in image_uri:
+        env_vars = {
+            'NCCL_SHM_DISABLE': '1'
+        }
 
-    pytorch = PyTorchModel(model_data=model_data, role='SageMakerRole', entry_point=mnist_script,
-                           image_uri=image_uri, sagemaker_session=sagemaker_session)
+    model = PyTorchModel(model_data=model_data, role='SageMakerRole', entry_point=mnist_script,
+                           image_uri=image_uri, sagemaker_session=sagemaker_session, env=env_vars)
     with timeout_and_delete_endpoint(endpoint_name, sagemaker_session, minutes=30):
-        predictor = pytorch.deploy(initial_instance_count=1, instance_type=instance_type,endpoint_name=endpoint_name)
+        predictor = model.deploy(initial_instance_count=1, instance_type=instance_type,endpoint_name=endpoint_name)
 
         batch_size = 100
         data = np.random.rand(batch_size, 1, 28, 28).astype(np.float32)
