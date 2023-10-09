@@ -11,6 +11,12 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 from __future__ import absolute_import
+
+try:
+    import transformers
+except ImportError:
+    raise ImportError("The 'transformers' module was not found.'")
+    
 import os
 import torch
 import torch.nn as nn

@@ -35,24 +35,30 @@ traced_resnet18_sub_dir = 'traced_resnet18'
 
 model_cpu_dir = os.path.join(mnist_path, cpu_sub_dir)
 mnist_cpu_script = os.path.join(model_cpu_dir, code_sub_dir, 'mnist.py')
+mnist_cpu_requirements = os.path.join(model_cpu_dir, code_sub_dir, 'requirements.txt')
 model_cpu_tar = file_utils.make_tarfile(mnist_cpu_script,
                                         os.path.join(model_cpu_dir, "torch_model.pth"),
                                         model_cpu_dir,
-                                        script_path="code")
+                                        script_path="code",
+                                        requirements=mnist_cpu_requirements)
 
 model_cpu_1d_dir = os.path.join(model_cpu_dir, '1d')
 mnist_1d_script = os.path.join(model_cpu_1d_dir, code_sub_dir, 'mnist_1d.py')
+mnist_1d_requirements = os.path.join(model_cpu_1d_dir, code_sub_dir, 'requirements.txt')
 model_cpu_1d_tar = file_utils.make_tarfile(mnist_1d_script,
                                            os.path.join(model_cpu_1d_dir, "torch_model.pth"),
                                            model_cpu_1d_dir,
-                                           script_path="code")
+                                           script_path="code",
+                                           requirements=mnist_1d_requirements)
 
 model_gpu_dir = os.path.join(mnist_path, gpu_sub_dir)
 mnist_gpu_script = os.path.join(model_gpu_dir, code_sub_dir, 'mnist.py')
+mnist_gpu_requirements = os.path.join(model_gpu_dir, code_sub_dir, 'requirements.txt')
 model_gpu_tar = file_utils.make_tarfile(mnist_gpu_script,
                                         os.path.join(model_gpu_dir, "torch_model.pth"),
                                         model_gpu_dir,
-                                        script_path="code")
+                                        script_path="code",
+                                        requirements=mnist_gpu_requirements)
 
 model_eia_dir = os.path.join(mnist_path, eia_sub_dir)
 mnist_eia_script = os.path.join(model_eia_dir, 'mnist.py')
@@ -67,11 +73,13 @@ model_inductor_tar = file_utils.make_tarfile(mnist_inductor_script,
                                         model_inductor_dir)
 
 call_model_fn_once_script = os.path.join(model_cpu_dir, code_sub_dir, 'call_model_fn_once.py')
+call_model_fn_once_requirements = os.path.join(model_cpu_dir, code_sub_dir, 'requirements.txt')
 call_model_fn_once_tar = file_utils.make_tarfile(call_model_fn_once_script,
                                                  os.path.join(model_cpu_dir, "torch_model.pth"),
                                                  model_cpu_dir,
                                                  "model_call_model_fn_once.tar.gz",
-                                                 script_path="code")
+                                                 script_path="code",
+                                                 requirements=call_model_fn_once_requirements)
 
 default_model_dir = os.path.join(resnet18_path, default_sub_dir)
 default_model_script = os.path.join(default_model_dir, code_sub_dir, "resnet18.py")
