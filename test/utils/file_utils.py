@@ -27,5 +27,5 @@ def make_tarfile(script, model, output_path, filename="model.tar.gz", script_pat
 
         if requirements and script_path:
             tar.add(requirements, arcname=os.path.join(script_path, os.path.basename(requirements)))
-            
+
     return output_filename

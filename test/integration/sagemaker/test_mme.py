@@ -12,7 +12,6 @@
 # language governing permissions and limitations under the License.
 from __future__ import absolute_import
 
-import numpy as np
 import json
 import boto3
 import pytest
@@ -24,21 +23,26 @@ import requests
 
 from integration import resnet18_tar, traced_resnet18_tar, resnet18_script
 
+
 @pytest.fixture(scope='module', name='resnet18_filename')
 def fixture_resnet18_filename():
     return resnet18_tar.split('/')[-1]
+
 
 @pytest.fixture(scope='module', name='traced_resnet18_filename')
 def fixture_traced_resnet18_filename():
     return traced_resnet18_tar.split('/')[-1]
 
+
 @pytest.fixture(scope='module', name='s3')
 def fixture_s3():
     return boto3.client('s3')
 
+
 @pytest.fixture(scope='module', name='bucket')
 def fixture_bucket(region, aws_id):
     return 'sagemaker-{}-{}'.format(region, aws_id)
+
 
 @pytest.fixture(scope='module', name='mme')
 def fixture_mme_endpoint(
@@ -64,15 +68,15 @@ def fixture_mme_endpoint(
         model_data_prefix = 's3://{}/sagemaker-pytorch-serving/mme_models/'.format(bucket)
 
         mme = MultiDataModel(
-            name = endpoint_name,
-            model_data_prefix = model_data_prefix,
-            model = model,
-            sagemaker_session = sagemaker_session
+            name=endpoint_name,
+            model_data_prefix=model_data_prefix,
+            model=model,
+            sagemaker_session=sagemaker_session
         )
 
         mme.deploy(
-            initial_instance_count = 1,
-            instance_type = instance_type,
+            initial_instance_count=1,
+            instance_type=instance_type,
             serializer=sagemaker.serializers.JSONSerializer(),
             deserializer=sagemaker.deserializers.JSONDeserializer()
         )
@@ -84,47 +88,60 @@ def fixture_mme_endpoint(
         delete_models([resnet18_filename, traced_resnet18_filename], s3, bucket)
         sagemaker_session.delete_endpoint(endpoint_name)
 
+
 def delete_models(filenames, s3, bucket):
     for filename in filenames:
         s3.delete_object(Bucket=bucket, Key='sagemaker-pytorch-serving/mme_models/{}'.format(filename))
 
+
 def add_models(model_tar_files, mme):
     for model_tar in model_tar_files:
         mme.add_model(model_tar)
+
 
 @pytest.fixture(scope='module', name='predictor', autouse=True)
 def fixture_predictor(mme, sagemaker_session):
     return Predictor(endpoint_name=mme.endpoint_name, sagemaker_session=sagemaker_session)
 
 # This test checks that only the ResNet-18 model in present in the multi-model endpoint.
+
+
 def test_check_only_resnet18_in_mme(mme, resnet18_filename):
     model_list = list(mme.list_models())
     assert resnet18_filename in model_list
-    assert len(model_list)==1
+    assert len(model_list) == 1
 
 # This test checks that only the traced ResNet-18 model in present in the multi-model endpoint.
+
+
 def test_check_only_traced_resnet18_in_mme(resnet18_filename, traced_resnet18_filename, mme, s3, bucket):
     delete_models([resnet18_filename], s3, bucket)
     add_models([traced_resnet18_tar], mme)
     model_list = list(mme.list_models())
     assert traced_resnet18_filename in model_list
-    assert len(model_list)==1
+    assert len(model_list) == 1
 
 # This test checks that both the ResNet-18 and traced ResNet-18 models are present in the multi-model endpoint.
+
+
 def test_check_both_models_in_mme(resnet18_filename, traced_resnet18_filename, mme):
     add_models([resnet18_tar], mme)
     model_list = list(mme.list_models())
     for filename in [resnet18_filename, traced_resnet18_filename]:
         assert filename in model_list
-    assert len(model_list)==2
+    assert len(model_list) == 2
 
 # This test checks that no models are present in the multi-model endpoint.
+
+
 def test_no_models_in_mme(resnet18_filename, traced_resnet18_filename, mme, s3, bucket):
     delete_models([resnet18_filename, traced_resnet18_filename], s3, bucket)
     model_list = list(mme.list_models())
-    assert len(model_list)==0
+    assert len(model_list) == 0
 
-# This test checks the invocation outputs from both the ResNet-18 and traced ResNet-18 models 
+# This test checks the invocation outputs from both the ResNet-18 and traced ResNet-18 models
+
+
 def test_invocation(resnet18_filename, traced_resnet18_filename, mme, predictor):
     add_models([resnet18_tar, traced_resnet18_tar], mme)
     image_url = (
@@ -138,10 +155,10 @@ def test_invocation(resnet18_filename, traced_resnet18_filename, mme, predictor)
         payload = f.read()
         payload = bytearray(payload)
 
-    resnet18_response = predictor.predict(payload, target_model=resnet18_filename) 
+    resnet18_response = predictor.predict(payload, target_model=resnet18_filename)
     resnet18_result = json.loads(resnet18_response.decode())
-    assert len(resnet18_result)==1000
+    assert len(resnet18_result) == 1000
 
-    traced_resnet18_response = predictor.predict(payload, target_model=traced_resnet18_filename) 
+    traced_resnet18_response = predictor.predict(payload, target_model=traced_resnet18_filename)
     traced_resnet18_result = json.loads(traced_resnet18_response.decode())
-    assert len(traced_resnet18_result)==1000
+    assert len(traced_resnet18_result) == 1000
