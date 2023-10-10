@@ -37,3 +37,4 @@ def test_ts_env():
     assert ts_env._min_workers == 1
     assert ts_env._max_workers == 4
     assert ts_env._response_timeout == 60
+    assert ts_env.is_env_set() is True
