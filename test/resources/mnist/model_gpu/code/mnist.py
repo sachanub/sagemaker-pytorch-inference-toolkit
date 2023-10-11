@@ -16,11 +16,6 @@ import logging
 import os
 import sys
 
-try:
-    import transformers
-except ImportError:
-    raise ImportError("The 'transformers' module was not found.'")
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -68,4 +63,4 @@ def model_fn(model_dir):
     # Move the model to the GPU
     device = torch.device("cuda")
     model = model.to(device)
-    return model
+    return model 

@@ -13,25 +13,15 @@
 from __future__ import absolute_import
 
 import os
+import torch
 
-
-def model_fn(model_dir):
-    lock_file = os.path.join(model_dir, 'model_fn.lock.{}'.format(os.getpid()))
-    if os.path.exists(lock_file):
-        raise RuntimeError('model_fn called more than once (lock: {})'.format(lock_file))
-
-    open(lock_file, 'a').close()
-
+def model_fn(model_dir, context):
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(script_dir, "device_info.txt")
+    
+    device = torch.device("cuda:" + str(context.system_properties.get("gpu_id")))
+    device_str = str(device)[-1]
+    with open(file_path, "a") as file:
+        file.write(device_str + "\n")
+    
     return 'model'
-
-
-def input_fn(data, content_type):
-    return data
-
-
-def predict_fn(data, model):
-    return b'output'
-
-
-def output_fn(prediction, accept):
-    return prediction

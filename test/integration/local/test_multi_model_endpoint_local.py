@@ -38,7 +38,7 @@ def container(image_uri, use_gpu):
         traced_resnet18_path = os.path.join(mme_path, 'traced_resnet18')
 
         command = (
-            "docker run -it --rm {} "
+            "docker run {} "
             "--name sagemaker-pytorch-inference-toolkit-mme-test "
             "-p 8080:8080 "
             "-v {}:/resnet18 "
