@@ -71,6 +71,8 @@ phases:
             execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg";
             docker system prune --all --force;
             cleanup-gpu-instances;
+            rm ~/.instance_id;
+            rm ~/.ip_address;
           done
       - cleanup-key-pairs;
 
