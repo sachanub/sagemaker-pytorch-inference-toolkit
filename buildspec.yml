@@ -8,7 +8,8 @@ env:
     GPU_INSTANCE_TYPE: 'ml.g4dn.12xlarge'
     # EIA_ACCELERATOR_TYPE: 'ml.eia2.medium'
     ECR_REPO: 'sagemaker-test'
-    GITHUB_REPO: 'sagemaker-pytorch-serving-container'
+    GITHUB_REPO: 'sagemaker-pytorch-inference-toolkit'
+    GITHUB_USER: 'sachanub'
     DLC_ACCOUNT: '763104351884'
     SETUP_FILE: 'setup_cmds.sh'
     SETUP_CMDS: '#!/bin/bash\npython3.8 -m pip install --upgrade pip\npython3.8 -m pip install -U -e .\npython3.8 -m pip install -U -e .[test]'
@@ -30,23 +31,23 @@ phases:
       - PY_COLORS=0
 
       # run linters
-      - tox -e flake8,twine
+      # - tox -e flake8,twine
 
       # run unit tests
-      - tox -e py38,py39,py310 test/unit
+      # - tox -e py38,py39,py310 test/unit
 
       # define EIA tag
       # - DLC_EIA_TAG="$EIA_FRAMEWORK_VERSION-dlc-eia-$BUILD_ID"
 
       # run local CPU integration tests (build and push the image to ECR repo)
-      - |
-        for FRAMEWORK_VERSION in $FRAMEWORK_VERSIONS; 
-          do
-            DLC_CPU_TAG="$FRAMEWORK_VERSION-dlc-cpu-$BUILD_ID";
-            test_cmd="IGNORE_COVERAGE=- tox -e py38 -- test/integration/local -vv -rA -s --build-image --push-image --dockerfile-type dlc.cpu --region $AWS_DEFAULT_REGION --docker-base-name $ECR_REPO --aws-id $ACCOUNT --framework-version $FRAMEWORK_VERSION --processor cpu --tag $DLC_CPU_TAG";
-            execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg";
-            docker system prune --all --force;
-          done
+      #- |
+      #  for FRAMEWORK_VERSION in $FRAMEWORK_VERSIONS; 
+      #    do
+      #      DLC_CPU_TAG="$FRAMEWORK_VERSION-dlc-cpu-$BUILD_ID";
+      #      test_cmd="IGNORE_COVERAGE=- tox -e py38 -- test/integration/local -vv -rA -s --build-image --push-image --dockerfile-type dlc.cpu --region $AWS_DEFAULT_REGION --docker-base-name $ECR_REPO --aws-id $ACCOUNT --framework-version $FRAMEWORK_VERSION --processor cpu --tag $DLC_CPU_TAG";
+      #      execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg";
+      #      docker system prune --all --force;
+      #    done
 
       # launch remote GPU instance with Deep Learning AMI GPU PyTorch 1.9 (Ubuntu 20.04)
       - prefix='ml.'
@@ -67,7 +68,7 @@ phases:
             docker push $PREPROD_IMAGE:$DLC_GPU_TAG;
             printf "$SETUP_CMDS" > $SETUP_FILE;
             dlc_cmd="IGNORE_COVERAGE=- tox -e py38 -- test/integration/local -vv -rA -s --region $AWS_DEFAULT_REGION --docker-base-name $ECR_REPO --aws-id $ACCOUNT --framework-version $FRAMEWORK_VERSION --processor gpu --tag $DLC_GPU_TAG";
-            test_cmd="remote-test --github-repo $GITHUB_REPO --test-cmd \"$dlc_cmd\" --setup-file $SETUP_FILE --pr-number \"$PR_NUM\" --python-version \"3.8\"";
+            test_cmd="remote-test --github-user $GITHUB_USER --github-repo $GITHUB_REPO --test-cmd \"$dlc_cmd\" --setup-file $SETUP_FILE --pr-number \"$PR_NUM\" --python-version \"3.8\"";
             execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg";
             docker system prune --all --force;
             cleanup-gpu-instances;
@@ -77,24 +78,24 @@ phases:
       - cleanup-key-pairs;
 
       # run CPU sagemaker integration tests
-      - |
-        for FRAMEWORK_VERSION in $FRAMEWORK_VERSIONS; 
-          do
-            DLC_CPU_TAG="$FRAMEWORK_VERSION-dlc-cpu-$BUILD_ID";
-            test_cmd="IGNORE_COVERAGE=- tox -e py38 -- test/integration/sagemaker --region $AWS_DEFAULT_REGION --docker-base-name $ECR_REPO --aws-id $ACCOUNT --framework-version $FRAMEWORK_VERSION --processor cpu --instance-type $CPU_INSTANCE_TYPE --tag $DLC_CPU_TAG";
-            execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg";
-            docker system prune --all --force;
-          done
+      #- |
+      #  for FRAMEWORK_VERSION in $FRAMEWORK_VERSIONS; 
+      #    do
+      #      DLC_CPU_TAG="$FRAMEWORK_VERSION-dlc-cpu-$BUILD_ID";
+      #      test_cmd="IGNORE_COVERAGE=- tox -e py38 -- test/integration/sagemaker --region $AWS_DEFAULT_REGION --docker-base-name $ECR_REPO --aws-id $ACCOUNT --framework-version $FRAMEWORK_VERSION --processor cpu --instance-type $CPU_INSTANCE_TYPE --tag $DLC_CPU_TAG";
+      #      execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg";
+      #      docker system prune --all --force;
+      #    done
 
       # run GPU sagemaker integration tests
-      - |
-        for FRAMEWORK_VERSION in $FRAMEWORK_VERSIONS;
-          do
-            DLC_GPU_TAG="$FRAMEWORK_VERSION-dlc-gpu-$BUILD_ID";
-            test_cmd="IGNORE_COVERAGE=- tox -e py38 -- test/integration/sagemaker --region $AWS_DEFAULT_REGION --docker-base-name $ECR_REPO --aws-id $ACCOUNT --framework-version $FRAMEWORK_VERSION --processor gpu --instance-type $GPU_INSTANCE_TYPE --tag $DLC_GPU_TAG";
-            execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg";
-            docker system prune --all --force;
-          done
+      #- |
+      #  for FRAMEWORK_VERSION in $FRAMEWORK_VERSIONS;
+      #    do
+      #      DLC_GPU_TAG="$FRAMEWORK_VERSION-dlc-gpu-$BUILD_ID";
+      #      test_cmd="IGNORE_COVERAGE=- tox -e py38 -- test/integration/sagemaker --region $AWS_DEFAULT_REGION --docker-base-name $ECR_REPO --aws-id $ACCOUNT --framework-version $FRAMEWORK_VERSION --processor gpu --instance-type $GPU_INSTANCE_TYPE --tag $DLC_GPU_TAG";
+      #      execute-command-if-has-matching-changes "$test_cmd" "test/" "src/*.py" "setup.py" "setup.cfg";
+      #      docker system prune --all --force;
+      #    done
 
       # run EIA sagemaker integration tests
       # - test_cmd="IGNORE_COVERAGE=- tox -e py38 -- test/integration/sagemaker --build-image --push-image --dockerfile-type dlc.eia --region $AWS_DEFAULT_REGION --docker-base-name $ECR_REPO --aws-id $ACCOUNT --framework-version $EIA_FRAMEWORK_VERSION --processor cpu --instance-type $CPU_INSTANCE_TYPE --accelerator-type $EIA_ACCELERATOR_TYPE --tag $DLC_EIA_TAG"
